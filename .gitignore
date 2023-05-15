@@ -13,3 +13,6 @@ vite/dist/*.html
 node_modules
 /vite/node_modules
 vite/node_modules
+
+tools/cqlsh-*
+.appconfig.yml

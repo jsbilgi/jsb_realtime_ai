@@ -83,6 +83,23 @@ curl -X POST http://<hostname>/chat \
 ```
 
 
+## Cassandra CQLSH / Schema setup
+
+```
+cd tools
+wget https://downloads.datastax.com/enterprise/cqlsh-6.8.31-bin.tar.gz
+tar xvfz cqlsh-6.8.31-bin.tar.gz
+./cqlsh-6.8.31/bin/cqlsh <hostname> -u <username> -p <password> 
+```
+
+Either copy and paste `data/cassandra.cql` or do this 
+```
+./cqlsh-6.8.31/bin/cqlsh <hostname> -u <username> -p <password> -f ../data/cassandra.cql
+```
+
+For [Connecting to Astra Cassandra as a Service with CQLSH](https://docs.datastax.com/en/astra-serverless/docs/connect/cql/connect-cqlsh.html#_standalone_cql_shell)
+
+
 ## Example prompts
 
 ### Conversation with memory

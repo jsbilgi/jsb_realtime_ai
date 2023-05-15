@@ -1,0 +1,34 @@
+common: #common keys used in all projects
+  openai:    
+    version: '2020-08-01'
+    models:
+      # default completion model
+      default: gpt-3.5-turbo
+      # default embedding model
+      embedding: text-embedding-ada-002
+      # open ai models available for completion (later for user choice)
+      completion:
+        - text-davinci-002
+        - text-davinci-003
+        - gpt-3.5-turbo
+  local:
+      root: "/workspace/Content.Automation/"
+      downloads: "downloads"
+
+applications:
+  # specific to chat / history  
+  chat: 
+    db:  
+      hostnames: "localhost"
+      port: 9042
+      username: cassandra
+      password: cassandra
+      keyspace: "account"
+      table_users: "users"
+      table_sessions: "user_sessions"
+      table_history: "user_history_chat"  
+      table_txt_cache: "llm_cache"
+      table_sem_cache: "llm_semanticcache"
+      table_prompts: "llm_prompts"      
+    
+      
