@@ -18,6 +18,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'write.html'),
         howdoi: resolve(__dirname, 'howdoi.html'),
+        chat: resolve(__dirname, 'chat.html'),
       },
     },
   },

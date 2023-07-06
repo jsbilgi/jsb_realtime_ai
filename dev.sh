@@ -1,1 +1,2 @@
-foreman start -f Procfile.local
+#foreman start -f Procfile.local
+honcho start -f Procfile.local

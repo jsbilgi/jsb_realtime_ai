@@ -12,4 +12,10 @@ tasks:
       pip install --upgrade pip
       pip install honcho
       pip install -r requirements.txt
-    command: echo "Python Upgraded, Honcho Installed, Requirements Installed"
+      cd vite
+      rm -rf node_modules
+      rm -rf dist/assets/*
+      npm install -g vite
+      npm install
+      yarn global add vite
+    command: echo "Python Upgraded, Honcho Installed, Requirements Installed, Vite Dir Cleaned & Vite Installed"

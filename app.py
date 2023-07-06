@@ -8,6 +8,7 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
 from langchain.prompts import FewShotPromptTemplate
 from langchain import OpenAI, PromptTemplate
+from langchain.chat_models import ChatOpenAI
 
 from utils.chat_agent import ChatAgent
 import logging
@@ -38,6 +39,11 @@ def howdoi(id=None):
     # return send_from_directory('./vite/dist', 'howdoi.html')
     if id is None:
         return render_template('howdoi.html')
+
+@app.route('/chatnew')
+def chatnew():
+    return send_from_directory('./vite/dist', 'chat.html')
+
 
 
 # Path for the rest of the static files (JS/CSS)
