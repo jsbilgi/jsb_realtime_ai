@@ -9,15 +9,23 @@ from dataclasses import dataclass
 from langchain.chains import LLMChain, LLMRequestsChain
 from langchain import Wikipedia, OpenAI
 from langchain.agents.react.base import DocstoreExplorer
-from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, get_all_tool_names, load_tools, initialize_agent
+from langchain.agents import (
+    ZeroShotAgent,
+    Tool,
+    AgentExecutor,
+    get_all_tool_names,
+    load_tools,
+    initialize_agent,
+)
 from langchain.prompts import PromptTemplate
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.agents.conversational.base import ConversationalAgent
 from datetime import datetime
-
+from langchain.chat_models import ChatOpenAI
 
 import langchain
 from langchain.cache import InMemoryCache
+
 langchain.llm_cache = InMemoryCache()
 
 
@@ -127,12 +135,12 @@ class ChatAgent:
             Tool(
                 name="FoursquareSearch",
                 func=foursquare.run,
-                description="useful for when you need to find information about a location, place, venue. Input should be a query, and output will be JSON data which you should summarize and give back relevant information."
+                description="useful for when you need to find information about a store, park, or other venue. Input should be a query, and output will be JSON data which you should summarize and give back relevant information."
             ),
             Tool(
                 name="FoursquareNear",
                 func=foursquare.near,
-                description="useful for when you need to find information about a location, place, venue in a particular city, town, neighborhood. Input should be a a comma separated list of strings of length two, representing what you want to search for and where. For example, `coffee shops, chicago il` would be the input if you wanted to search for coffee shops in or near chicago, illinois and output will be JSON data which you should summarize and give back relevant information."
+                description="useful for when you need to find information about a store, park, or other venue in a particular location. Input should be a pipe separated list of strings of length two, representing what you want to search for and where. For example, `coffee shops| \"chicago il\"` would be the input if you wanted to search for coffee shops in or near chicago, illinois and output will be JSON data which you should summarize and give back relevant information."
             ),            
             Tool(
                 name="Requests",
@@ -162,7 +170,7 @@ Assistant has access to the following tools:
         suffix = f"""
 The current date is {date}. Questions that refer to a specific date or time period will be interpreted relative to this date.
 
-After you answer the question, you MUST to determine which langauge your answer is written in, and append the language code to the end of the Final Answer, within parentheses, like this (en-US).
+After you answer the question, you MUST to determine which language your answer is written in, and append the language code to the end of the Final Answer, within parentheses, like this (en-US).
 
 Begin!
 
@@ -178,7 +186,7 @@ New input: {{input}}
             memory.save_context(
                 {f"{ai_prefix}": item["prompt"]}, {f"{human_prefix}": item["response"]})
 
-        llm = OpenAI(temperature=.5, model_name="gpt-3.5-turbo")
+        llm = ChatOpenAI(temperature=.5, model_name="gpt-3.5-turbo")
         llm_chain = LLMChain(
             llm=llm,
             prompt=ConversationalAgent.create_prompt(

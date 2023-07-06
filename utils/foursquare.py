@@ -27,7 +27,7 @@ def search_places(query: str, api_key: str, limit: int) -> dict:
         return response.json()
 
 def search_places_near(query: str, near: str, api_key: str, limit: int) -> dict:
-        """Search for places on Foursquare given a query and API key."""
+        """Search for places on Foursquare given a query and where and API key."""
         url = "https://api.foursquare.com/v3/places/search"
         headers = {
             "Authorization": api_key,
@@ -100,7 +100,7 @@ class FoursquareAPIWrapper(BaseModel):
     def run(self, query: str) -> str:
         """Run query through FoursquareAPI and parse result."""
         api_key = self.foursquare_api_key  # str | Foursquare API Key.
-        q = query  # str | Search query term or prhase.
+        q = query  # str | Search query term or phrase.
         # int | The maximum number of records to return. 
         limit = 5
 
@@ -119,7 +119,7 @@ class FoursquareAPIWrapper(BaseModel):
     def near(self, query: str) -> str:
         """Run query through FoursquareAPI and parse result."""
         api_key = self.foursquare_api_key  # str | Foursquare API Key.
-        q,n = query.split(",")  # str | Search query term or prhase.
+        q,n = query.split("|")  # str | Search query term or phrase.
         
         # int | The maximum number of records to return. 
         limit = 5
@@ -127,7 +127,7 @@ class FoursquareAPIWrapper(BaseModel):
         with HiddenPrints():
             try:
                 # Search Endpoint
-                api_response = search_places_near(query=q, api_key=api_key, limit=limit)  
+                api_response = search_places_near(query=q, near=n,api_key=api_key, limit=limit)  
             except requests.exceptions.HTTPError as e:
                 raise ValueError(f"Got error from FoursquareAPI: {e}")
 

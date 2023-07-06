@@ -44,12 +44,56 @@ def howdoi(id=None):
 def chatnew():
     return send_from_directory('./vite/dist', 'chat.html')
 
-
-
 # Path for the rest of the static files (JS/CSS)
 @app.route('/<path:path>')
 def assets(path):
     return send_from_directory('./vite/dist', path)
+
+@ app.route('/chat', methods=['POST', 'GET'])
+def chat():
+    json = request.get_json(force=True)
+    history_array = json.get('history')
+
+    input = json.get('prompt')
+    print("\n\n#### INPUT ####\n")
+    print(input)
+    print("\n\n#### INPUT ####\n")
+
+    chat_agent = ChatAgent(history_array=history_array)
+
+    try:
+        reply = chat_agent.agent_executor.run(input=input)
+
+    except ValueError as inst:
+        print('ValueError:\n')
+        print(inst)
+        reply = "Sorry, there was an error processing your request."
+
+    print("\n\n#### REPLY ####\n")
+    print(reply)
+    print("\n\n#### REPLY ####\n")
+
+    pattern = r'\(([a-z]{2}-[A-Z]{2})\)'
+    # Search for the local pattern in the string
+    match = re.search(pattern, reply)
+
+    language = 'en-US'  # defaut
+    if match:
+        # Get the language code
+        language = match.group(1)
+
+        # Remove the language code from the reply
+        reply = re.sub(pattern, '', reply)
+
+    print("LANG: ", language)
+
+    sys.stdout.flush()
+    return {
+        'input': input,
+        'text': reply.strip(),
+        'language': language
+    }
+
 
 
 @app.route('/editor', methods=['POST', 'GET'])
@@ -154,48 +198,3 @@ Thought:
     }, status
 
 
-
-@ app.route('/chat', methods=['POST', 'GET'])
-def chat():
-    json = request.get_json(force=True)
-    history_array = json.get('history')
-
-    input = json.get('prompt')
-    print("\n\n#### INPUT ####\n")
-    print(input)
-    print("\n\n#### INPUT ####\n")
-
-    chat_agent = ChatAgent(history_array=history_array)
-
-    try:
-        reply = chat_agent.agent_executor.run(input=input)
-
-    except ValueError as inst:
-        print('ValueError:\n')
-        print(inst)
-        reply = "Sorry, there was an error processing your request."
-
-    print("\n\n#### REPLY ####\n")
-    print(reply)
-    print("\n\n#### REPLY ####\n")
-
-    pattern = r'\(([a-z]{2}-[A-Z]{2})\)'
-    # Search for the local pattern in the string
-    match = re.search(pattern, reply)
-
-    language = 'en-US'  # defaut
-    if match:
-        # Get the language code
-        language = match.group(1)
-
-        # Remove the language code from the reply
-        reply = re.sub(pattern, '', reply)
-
-    print("LANG: ", language)
-
-    sys.stdout.flush()
-    return {
-        'input': input,
-        'text': reply.strip(),
-        'language': language
-    }
