@@ -49,6 +49,7 @@ def chatnew():
 def assets(path):
     return send_from_directory('./vite/dist', path)
 
+# This is the endpoint that powers the / UI - everything is inside utils/chat_agent.py
 @ app.route('/chat', methods=['POST', 'GET'])
 def chat():
     json = request.get_json(force=True)
@@ -95,7 +96,7 @@ def chat():
     }
 
 
-
+# this is for the /write UI - a document editor that uses GPT to help write
 @app.route('/editor', methods=['POST', 'GET'])
 def prompt():
     prompt = request.get_json(force=True)
@@ -163,22 +164,12 @@ Thought:
     )
 
     chain = LLMChain(llm=llm, prompt=similar_prompt, verbose=True)
-    # chain = LLMChain(llm=llm, prompt=zero_shot_prompt, verbose=True)
-
     # add a try except block to catch errors
     try:
         completion = chain.predict(
             input=input, instruction=instruction, operation=operation)
     except:
         completion = "I'm sorry, I can't help with this."
-
-    # # import betterprompt
-    # # perplexity = betterprompt.calculate_perplexity(similar_prompt.format(
-    # #     input=input, instruction=instruction, operation=operation))
-
-    # print("\nPerplexity: ", 'blue')
-    # print(perplexity, 'blue')
-    # print('\n', 'blue')
 
     print(completion)
 
