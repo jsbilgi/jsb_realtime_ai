@@ -1,7 +1,7 @@
 Flask==2.2.2
 giphy_client==1.0.0
-langchain==0.0.161
-pydantic==1.10.2
+langchain==0.0.228
+pydantic==1.10.11
 supabase==1.0.2
 wikipedia
 openai
