@@ -26,6 +26,7 @@ from langchain.chat_models import ChatOpenAI
 
 import langchain
 from langchain.cache import InMemoryCache
+from langchain.utilities import SerpAPIWrapper
 
 langchain.llm_cache = InMemoryCache()
 
@@ -71,30 +72,25 @@ class ChatAgent:
         )
 
         def lambda_func(input):
-            out = chain = LLMRequestsChain(llm_chain=LLMChain(
-                llm=OpenAI(temperature=0),
-                prompt=PROMPT)).run(input)
+            out = chain = LLMRequestsChain(llm_chain=LLMChain(llm=OpenAI(temperature=0), prompt=PROMPT)).run(input)
             return out.strip()
-            # return out
+
         return lambda_func
+
+    def _get_serpapi_llm_tool(self):
+        serpapi_agent = SerpAPIWrapper()
+        return serpapi_agent
 
     def __init__(self, *, conversation_chain: LLMChain = None, history_array):
         date = datetime.today().strftime('%B %d, %Y')
 
+        serpapi_agent = self._get_serpapi_llm_tool()
+
         # set up a Wikipedia docstore agent
         docstore_agent = self._get_docstore_agent()
 
-        # giphy = GiphyAPIWrapper()
-        # foursquare = FoursquareAPIWrapper()
-
-        #tool_names = get_all_tool_names()
-        #tool_names.remove("pal-math")
-        #tool_names.remove("requests")  # let's use the llm_requests instead
-        # let's use the llm_requests instead
-        #tool_names.remove("google-search")
-        #tool_names.remove("pal-colored-objects")
-        #tool_names.remove("python_repl")
-        #tool_names.remove("terminal")
+        giphy = GiphyAPIWrapper()
+        foursquare = FoursquareAPIWrapper()
 
         tool_names = [
             'serpapi',
@@ -129,22 +125,22 @@ class ChatAgent:
                 description="Useful for answering a wide range of factual, scientific, academic, political and historical questions.",
                 func=docstore_agent.run
             ),
-            # Tool(
-            #     name="GiphySearch",
-            #     func=giphy.run,
-            #     return_direct=True,
-            #     description="useful for when you need to find a gif or picture, and for adding humor to your replies. Input should be a query, and output will be an html embed code which you MUST include in your Final Answer."
-            # ),
-            # Tool(
-            #     name="FoursquareSearch",
-            #     func=foursquare.run,
-            #     description="useful for when you need to find information about a store, park, or other venue. Input should be a query, and output will be JSON data which you should summarize and give back relevant information."
-            # ),
-            # Tool(
-            #     name="FoursquareNear",
-            #     func=foursquare.near,
-            #     description="useful for when you need to find information about a store, park, or other venue in a particular location. Input should be a pipe separated list of strings of length two, representing what you want to search for and where. For example, `coffee shops| \"chicago il\"` would be the input if you wanted to search for coffee shops in or near chicago, illinois and output will be JSON data which you should summarize and give back relevant information."
-            # ),            
+            Tool(
+                name="GiphySearch",
+                func=giphy.run,
+                return_direct=True,
+                description="useful for when you need to find a gif or picture, and for adding humor to your replies. Input should be a query, and output will be an html embed code which you MUST include in your Final Answer."
+            ),
+            Tool(
+                name="FoursquareSearch",
+                func=foursquare.run,
+                description="useful for when you need to find information about a store, park, or other venue. Input should be a query, and output will be JSON data which you should summarize and give back relevant information."
+            ),
+            Tool(
+                name="FoursquareNear",
+                func=foursquare.near,
+                description="useful for when you need to find information about a store, park, or other venue in a particular location. Input should be a pipe separated list of strings of length two, representing what you want to search for and where. For example, `coffee shops| \"chicago il\"` would be the input if you wanted to search for coffee shops in or near chicago, illinois and output will be JSON data which you should summarize and give back relevant information."
+            ),            
             Tool(
                 name="Requests",
                 func=requests_tool,
