@@ -18,4 +18,5 @@ tasks:
       npm install -g vite
       npm install
       yarn global add vite
+      cd ..
     command: echo "Python Upgraded, Honcho Installed, Requirements Installed, Vite Dir Cleaned & Vite Installed"
