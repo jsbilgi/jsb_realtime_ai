@@ -16,6 +16,7 @@ from langchain.agents import (
     get_all_tool_names,
     load_tools,
     initialize_agent,
+    AgentType,
 )
 from langchain.prompts import PromptTemplate
 from langchain.chains.conversation.memory import ConversationBufferMemory
@@ -25,12 +26,13 @@ from langchain.chat_models import ChatOpenAI
 
 import langchain
 from langchain.cache import InMemoryCache
+from langchain.utilities import SerpAPIWrapper
 
 langchain.llm_cache = InMemoryCache()
 
 
 news_api_key = os.environ["NEWS_API_KEY"]
-tmdb_bearer_token = os.environ["TMDB_API_KEY"]
+# tmdb_bearer_token = os.environ["TMDB_API_KEY"]
 
 
 @dataclass
@@ -51,11 +53,12 @@ class ChatAgent:
                 description="Lookup a wikipedia page"
             )
         ]
-        #docstore_llm = OpenAI(temperature=0, model_name="text-davinci-003")
+
+        docstore_llm = OpenAI(temperature=0, model_name="text-davinci-003")
         # gpt-3.5-turbo is 1/10th the cost of text-davinci-003 https://platform.openai.com/docs/models/gpt-3-5
-        docstore_llm = OpenAI(temperature=0, model_name="gpt-3.5-turbo")
-        docstore_agent = initialize_agent(
-            docstore_tools, docstore_llm, agent="react-docstore", verbose=True)
+        # docstore_llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
+        docstore_agent = initialize_agent(docstore_tools, docstore_llm, agent=AgentType.REACT_DOCSTORE, verbose=True)
+
         return docstore_agent
 
     def _get_requests_llm_tool(self):
@@ -69,15 +72,19 @@ class ChatAgent:
         )
 
         def lambda_func(input):
-            out = chain = LLMRequestsChain(llm_chain=LLMChain(
-                llm=OpenAI(temperature=0),
-                prompt=PROMPT)).run(input)
+            out = chain = LLMRequestsChain(llm_chain=LLMChain(llm=OpenAI(temperature=0), prompt=PROMPT)).run(input)
             return out.strip()
-            # return out
+
         return lambda_func
+
+    def _get_serpapi_llm_tool(self):
+        serpapi_agent = SerpAPIWrapper()
+        return serpapi_agent
 
     def __init__(self, *, conversation_chain: LLMChain = None, history_array):
         date = datetime.today().strftime('%B %d, %Y')
+
+        serpapi_agent = self._get_serpapi_llm_tool()
 
         # set up a Wikipedia docstore agent
         docstore_agent = self._get_docstore_agent()
@@ -85,33 +92,25 @@ class ChatAgent:
         giphy = GiphyAPIWrapper()
         foursquare = FoursquareAPIWrapper()
 
-        #tool_names = get_all_tool_names()
-        #tool_names.remove("pal-math")
-        #tool_names.remove("requests")  # let's use the llm_requests instead
-        # let's use the llm_requests instead
-        #tool_names.remove("google-search")
-        #tool_names.remove("pal-colored-objects")
-        #tool_names.remove("python_repl")
-        #tool_names.remove("terminal")
-
         tool_names = [
             'serpapi',
-            'wolfram-alpha',
+            # 'wolfram-alpha',
             'llm-math',
-            'open-meteo-api',
+            # 'open-meteo-api',
             'news-api',
-            'tmdb-api',
+            # 'tmdb-api',
             'wikipedia'
         ]
 
 
         requests_tool = self._get_requests_llm_tool()
 
-        tools = load_tools(tool_names,
-                           llm=OpenAI(temperature=0,
-                                      model_name="gpt-3.5-turbo"),
-                           news_api_key=news_api_key,
-                           tmdb_bearer_token=tmdb_bearer_token)
+        tools = load_tools(
+            tool_names,
+            llm=OpenAI(temperature=0, model_name="text-davinci-003"),
+            news_api_key=news_api_key,
+            # tmdb_bearer_token=tmdb_bearer_token
+        )
 
         # Tweak some of the tool descriptions
         for tool in tools:
@@ -148,6 +147,7 @@ class ChatAgent:
                 description="A portal to the internet. Use this when you need to get specific content from a site. Input should be a specific url, and the output will be all the text on that page."
             )
         ]
+
         ai_prefix = "AI"
         human_prefix = "Human"
 
@@ -159,12 +159,12 @@ class ChatAgent:
 
 If {ai_prefix} can't provide a good response, it will truthfully answer that it can't help with the user's request.
 
-Overall, Assistant is a powerful tool that can help with a wide range of tasks and provide valuable insights and information on a wide range of topics. Whether you need help with a specific question or just want to have a conversation about a particular topic, Assistant is here to assist.
+Overall, {ai_prefix} is a powerful tool that can help with a wide range of tasks and provide valuable insights and information on a wide range of topics. Whether you need help with a specific question or just want to have a conversation about a particular topic, Assistant is here to assist.
 
 TOOLS:
 ------
 
-Assistant has access to the following tools:
+{ai_prefix} has access to the following tools:
 """
 
         suffix = f"""
@@ -186,26 +186,22 @@ New input: {{input}}
             memory.save_context(
                 {f"{ai_prefix}": item["prompt"]}, {f"{human_prefix}": item["response"]})
 
-        llm = ChatOpenAI(temperature=.5, model_name="gpt-3.5-turbo")
+        llm = OpenAI(temperature=.5, model_name="text-davinci-003")
         llm_chain = LLMChain(
             llm=llm,
-            prompt=ConversationalAgent.create_prompt(
-                tools,
-                ai_prefix=ai_prefix,
-                human_prefix=human_prefix,
-                suffix=suffix
-            ),
+            prompt=ConversationalAgent.create_prompt(tools, ai_prefix=ai_prefix, human_prefix=human_prefix, suffix=suffix),
         )
 
-        agent_obj = ConversationalAgent(
-            llm_chain=llm_chain, ai_prefix=ai_prefix)
+        agent_obj = ConversationalAgent(llm_chain=llm_chain, ai_prefix=ai_prefix)
 
         self.agent_executor = AgentExecutor.from_agent_and_tools(
             agent=agent_obj,
             tools=tools,
             verbose=True,
             max_iterations=5,
-            memory=memory)
+            memory=memory,
+            handle_parsing_errors=False
+        )
 
         # self.agent_executor = AgentExecutor.from_agent_and_tools(
         #     agent=agent,

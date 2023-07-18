@@ -2,7 +2,7 @@
 import * as htmlToImage from "html-to-image";
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from "html-to-image";
 const synth = window.speechSynthesis;
-const speechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 import hljs from "highlight.js";
 import "highlight.js/styles/monokai-sublime.css";
