@@ -16,3 +16,5 @@ vite/node_modules
 
 tools/cqlsh-*
 .appconfig.yml
+
+.chainlit/*.db
