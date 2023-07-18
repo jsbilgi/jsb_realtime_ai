@@ -1,7 +1,7 @@
 import chainlit as cl
 import os
 from langchain import OpenAI, LLMMathChain, SerpAPIWrapper
-from langchain.agents import initialize_agent, Tool
+from langchain.agents import initialize_agent, Tool, ZeroShotAgent
 from langchain.chat_models import ChatOpenAI
 from utils.giphy import GiphyAPIWrapper
 from utils.foursquare import FoursquareAPIWrapper
@@ -50,5 +50,5 @@ def load():
         )  
     ]
     return initialize_agent(
-        tools, llm1, agent="chat-zero-shot-react-description", verbose=True
+        tools, llm1, agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
     )

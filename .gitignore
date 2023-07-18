@@ -18,3 +18,4 @@ tools/cqlsh-*
 .appconfig.yml
 
 .chainlit/*.db
+.chainlit/.*.db
