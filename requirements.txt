@@ -9,3 +9,5 @@ wolframalpha
 google-api-python-client
 google-search-results
 python-dotenv
+tiktoken
+faiss-cpu
