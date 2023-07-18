@@ -11,7 +11,7 @@ Make sure you can run the [Colab Notebook](http://colab.research.google.com/gith
 
 - FDIC Failed Bank List - https://catalog.data.gov/dataset/fdic-failed-bank-list / https://www.fdic.gov/bank/individual/failed/banklist.csv
     `curl -L https://www.fdic.gov/bank/individual/failed/banklist.csv --output banklist.csv`
-- The Cask of Amonitllado - https://raw.githubusercontent.com/CassioML/cassio-website/main/docs/frameworks/langchain/texts/amontillado.txt 
+- The Cask of Amontillado - https://raw.githubusercontent.com/CassioML/cassio-website/main/docs/frameworks/langchain/texts/amontillado.txt 
     `curl https://raw.githubusercontent.com/CassioML/cassio-website/main/docs/frameworks/langchain/texts/amontillado.txt --output amontillado.txt`
 
 ```
