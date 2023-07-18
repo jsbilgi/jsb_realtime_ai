@@ -32,7 +32,7 @@ langchain.llm_cache = InMemoryCache()
 
 
 news_api_key = os.environ["NEWS_API_KEY"]
-# tmdb_bearer_token = os.environ["TMDB_API_KEY"]
+tmdb_bearer_token = os.environ["TMDB_API_KEY"]
 
 
 @dataclass
@@ -109,7 +109,7 @@ class ChatAgent:
             tool_names,
             llm=OpenAI(temperature=0, model_name="text-davinci-003"),
             news_api_key=news_api_key,
-            # tmdb_bearer_token=tmdb_bearer_token
+            tmdb_bearer_token=tmdb_bearer_token
         )
 
         # Tweak some of the tool descriptions
