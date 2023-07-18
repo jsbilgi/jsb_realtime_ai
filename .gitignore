@@ -19,3 +19,10 @@ tools/cqlsh-*
 
 .chainlit/*.db
 .chainlit/.*.db
+
+data/documents/*.doc
+data/documents/*.txt
+data/documents/*.pdf
+data/documents/*.csv
+data/documents/*.json
+data/*.zip

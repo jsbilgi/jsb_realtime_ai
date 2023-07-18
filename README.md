@@ -20,32 +20,17 @@ For those who want to use this to it's fullest ability you'll need to get API ke
 | GOOGLE_API_KEY | https://console.cloud.google.com/apis/credentials | Todo |
 | GOOGLE_CSE_ID | ??? | Todo |
 | FOURSQUARE_API_KEY | https://developer.foursquare.com | Yes |
+| ASTRA_* | https://astra.datastax.com | Works? |
 
 More on GOOGLE (in General) https://stackoverflow.com/questions/37083058/programmatically-searching-google-in-python-using-custom-search
+
 
 ## Running locally
 
 First, add your API keys in the `.env` file.
 
-Then, install the Python requirements and start the app. You'll want a Procfile manager like [Foreman](https://github.com/ddollar/foreman) or [Hivemind](https://github.com/DarthSim/hivemind) installed.
-
-```
-pip install -r requirements.txt
-foreman start -f Procfile.local
-```
-
-Once it's running, open up [http://127.0.0.1:9000/](http://127.0.0.1:9000/) and you'll be able to start interacting with the bot. There's also a writing assistant endpoint at [http://127.0.0.1:9000/write](http://127.0.0.1:9000/write).
-
-
-## Running in Gitpod
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xingh/iris)
-
-First, add your API keys in the `.env` file.
-
 Then, install the Python requirements and start the app. You can use a Procfile manager like [Foreman](https://github.com/ddollar/foreman) or [Hivemind](https://github.com/DarthSim/hivemind) installed. My prerence was to keep it with the Python theme. [Honcho](https://github.com/nickstenning/honcho) is a tool that does the same thing. 
 
-I preppedd the Gitpod this way, but also have added it to the .gitpod.yml
 ```
 pyenv install 3.9
 pyenv local 3.9
@@ -69,7 +54,52 @@ pip install -r requirements.txt
 honcho start -f Procfile.local
 ```
 
+
 Once it's running, open up [http://127.0.0.1:9000/](http://127.0.0.1:9000/) and you'll be able to start interacting with the bot. There's also a writing assistant endpoint at [http://127.0.0.1:9000/write](http://127.0.0.1:9000/write).
+
+
+## Running in Gitpod
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xingh/iris)
+
+First, add your API keys in the `.env` file.
+
+Then, install the Python requirements and start the app. You can use a Procfile manager like [Foreman](https://github.com/ddollar/foreman) or [Hivemind](https://github.com/DarthSim/hivemind) installed. My prerence was to keep it with the Python theme. [Honcho](https://github.com/nickstenning/honcho) is a tool that does the same thing. 
+
+I prepped the Gitpod this way, but also have added it to the .gitpod.yml, which means all this should already be done for you. 
+```
+pyenv install 3.9
+pyenv local 3.9
+pip install --upgrade pip
+pip install honcho 
+```
+
+To fix node/vite issues
+```
+rm -rf node_modules
+cd vite
+rm -rf node_modules
+rm -rf dist/assets/*
+npm install -g vite
+npm install
+yarn global add vite
+```
+
+```
+pip install -r requirements.txt
+honcho start -f Procfile.local
+```
+
+Once it's running, open up, you'll see a notification that a new port is available, and you can expose the port publicly. You can find it at the bottom of Gitpod.io's VS Code editor. Click on "Ports" and you can see which ports are open and click on them to take you directly to the app. You can also see if the port is open or closed with a lock icon. 
+
+
+
+## Using Chainlit - Quick and Dirty 
+First, add your API keys in the `.env` file. OPENAI, SERP at the very least. You can comment out the other tools to get it to work. 
+
+`chainlit run chainlit.py -w` 
+
+This will open up another URL / Port which you can start using. 
 
 ## API Endpoint
 
@@ -81,6 +111,14 @@ curl -X POST http://<hostname>/chat \
    -d '{"prompt":"Show me a cat gif","model":"text-davinci-003","temperature":0.5, "max_tokens":512,"history":[]}'  
 
 ```
+
+## Loading Data into Cassandra Vector Database 
+
+If you want to store vast amounts of your data and talk to it, you need to get a vector database setup. Read up on [CassIO's Start Here](https://cassio.org/start_here/) page. 
+Make sure you can run the [Colab Notebook](http://colab.research.google.com/github/CassioML/cassio-website/blob/main/docs/frameworks/langchain/.colab/colab_qa-basic.ipynb)
+
+If you are good to go there, follow the instructions in [Data/Documents/Readme](./data/documents/readme.md). 
+
 
 
 ## Cassandra CQLSH / Schema setup
