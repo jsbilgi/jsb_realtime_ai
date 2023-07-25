@@ -16,3 +16,5 @@ cassandra-driver>=3.28.0
 cassio==0.0.7
 tensorflow-cpu==2.12.0
 transformers>=4.29.2
+llama_index
+pypdf
