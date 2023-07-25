@@ -26,3 +26,5 @@ data/documents/*.pdf
 data/documents/*.csv
 data/documents/*.json
 data/*.zip
+
+storage/
