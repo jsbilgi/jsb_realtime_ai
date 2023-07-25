@@ -95,11 +95,22 @@ Once it's running, open up, you'll see a notification that a new port is availab
 
 
 ## Using Chainlit - Quick and Dirty 
-First, add your API keys in the `.env` file. OPENAI, SERP at the very least. You can comment out the other tools to get it to work. 
+First, add your API keys in the `.env` file. OPENAI, SERP at the very least. You can comment out the other tools to get it to work. Make sure you read and follow the instructions in [Data/Documents/Readme](./data/documents/readme.md). 
+
+Chainlit.py uses Langchain. 
 
 `chainlit run chainlit.py -w` 
 
 This will open up another URL / Port which you can start using. 
+
+You can also try using the Llamaindex version which loads in PDFs. The sample has the FLARE and ReACT papers, but you can upload any PDFs or other types of files to `data/papers`.
+
+`chainlit run chainlit_papers.py -w` 
+
+
+This will open up another URL / Port which you can start using. 
+
+
 
 ## API Endpoint
 
