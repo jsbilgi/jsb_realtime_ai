@@ -190,7 +190,7 @@ class KnowledgeWrapper(BaseModel):
             try:
                 # Get Answer
                 response = index.query(query, llm=llm)            
-            except ApiException as e:
+            except Exception as e:
                 raise ValueError(f"Got error from Cassio / LangChain Index: {e}")
 
         return response
@@ -206,7 +206,7 @@ class KnowledgeWrapper(BaseModel):
             try:
                 # Get Answer
                 response = index.query(query, llm=llm)            
-            except ApiException as e:
+            except Exception as e:
                 raise ValueError(f"Got error from Cassio / LangChain Index: {e}")
 
         return response
