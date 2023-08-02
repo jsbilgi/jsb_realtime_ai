@@ -9,19 +9,18 @@ from utils.knowledge import KnowledgeWrapper
 
 @cl.on_chat_start
 def start():
-    # Main llm for Chat 
-    llm_math = ChatOpenAI(temperature=0, streaming=True)
-
     # LLM for Math Chain 
-    llm_chain = OpenAI(temperature=0, streaming=True)
+    llm = ChatOpenAI(temperature=0, streaming=True)
+
+    # Main llm for Chat 
+    llm1 = OpenAI(temperature=0, streaming=True)
 
     search = SerpAPIWrapper()
-    llm_math_chain = LLMMathChain.from_llm(llm=llm_math, verbose=True)
+    llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=True)
     # Custom tools 
     giphy = GiphyAPIWrapper()
     foursquare = FoursquareAPIWrapper()
     knowledge = KnowledgeWrapper()
-
     tools = [  
         Tool(
             name="Search",
@@ -61,15 +60,13 @@ def start():
             description="useful for when you need to answer literary questions about The Cask of Amontillado, a short story by Edgar Alan Poe. This uses a vector similarity search. You should ask targeted questions to find similar documents. Input should be a query, and output will be an answer which you should summarize and give back relevant information."
         )       
     ]
-
-    agent = initialize_agent(
-        tools, llm_chain, agent=agent_types.AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
+    agent1 = initialize_agent(
+        tools, llm1, agent=agent_types.AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
     )
-    cl.user_session.set("agent", agent)
+    cl.user_session.set("agent1", agent1)
 
 @cl.on_message
 async def main(message):
-    agent = cl.user_session.get("agent")  # type: AgentExecutor
+    agent1 = cl.user_session.get("agent1")  # type: AgentExecutor
     cb = cl.LangchainCallbackHandler(stream_final_answer=True)
-
-    await cl.make_async(agent.run)(message, callbacks=[cb])
+    await cl.make_async(agent1.run)(message, callbacks=[cb])

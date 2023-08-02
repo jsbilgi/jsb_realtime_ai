@@ -1,6 +1,9 @@
 """Chain that calls data stored in a knowledge base created by me
 
 """
+import giphy_client
+from giphy_client.rest import ApiException
+
 # Imports to connect to Cassandra
 from cassandra.cluster import (
     Cluster,
@@ -75,7 +78,6 @@ myEmbedding = OpenAIEmbeddings()
 # Ingest the amontillado text 
 def ingest_amontillado():
     table_name = 'text_amontillado'
-
     index_creator = VectorstoreIndexCreator(
         vectorstore_cls=Cassandra,
         embedding=myEmbedding,
@@ -89,7 +91,6 @@ def ingest_amontillado():
             'table_name': table_name,
         },    
     )
-
     print(f"Loading data into Vector Store: {table_name}: Started")
     text_loader = TextLoader('data/documents/amontillado.txt', encoding='utf8')
     index = index_creator.from_loaders([text_loader])
@@ -98,7 +99,6 @@ def ingest_amontillado():
 # Ingest the failed bank list csv 
 def ingest_banks():
     table_name = 'csv_banklist'
-
     index_creator = VectorstoreIndexCreator(
         vectorstore_cls=Cassandra,
         embedding=myEmbedding,
@@ -108,36 +108,29 @@ def ingest_banks():
             'table_name': table_name,
         },    
     )
-
     print(f"Loading data into Vector Store: {table_name}: Started")
     csv_loader = CSVLoader('data/documents/banklist.csv', encoding='latin-1')
     index = index_creator.from_loaders([csv_loader])
     print(f"Loading data into Vector Store:  {table_name}: Done")
 
-
 # reusable get index method to get the index backed by a Cassandra vector store 
 def getIndex(name:str):
     table_name = name
-
     myCassandraVStore = Cassandra(
         embedding=myEmbedding,
         session=session,
         keyspace=keyspace,
         table_name= table_name
     )
-
     index = VectorStoreIndexWrapper(vectorstore=myCassandraVStore)
     return index
 
-
 class HiddenPrints:
     """Context manager to hide prints."""
-
     def __enter__(self) -> None:
         """Open file to pipe stdout to."""
         self._original_stdout = sys.stdout
         sys.stdout = open(os.devnull, "w")
-
     def __exit__(self, *_: Any) -> None:
         """Close file that stdout was piped to."""
         sys.stdout.close()
@@ -161,9 +154,7 @@ class KnowledgeWrapper(BaseModel):
     """
     class Config:
         """Configuration for this pydantic object."""
-
         extra = Extra.forbid
-
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that we can get the Keyspace and Creds via ENV Vars"""
@@ -178,11 +169,10 @@ class KnowledgeWrapper(BaseModel):
                 "Please add them to your .env file as instructed."
             )
         return values
-
     
     def banks(self, query: str) -> str:
         """Get answer from Vector Store with text of The Cask of Amontillado"""
-
+        print("Hello JSB ", query)
         q = query  # str | Search query term or phrase.
         table_name = 'csv_banklist'
         index = getIndex(table_name)
@@ -190,28 +180,22 @@ class KnowledgeWrapper(BaseModel):
             try:
                 # Get Answer
                 response = index.query(query, llm=llm)            
-            except Exception as e:
-                raise ValueError(f"Got error from Cassio / LangChain Index: {e}")
-
+            except ApiException as e:
+                raise ValueError(f"Got error from Cassio / LangChain Index 1 : {e}")
         return response
-
+    
     def amontillado(self, query: str) -> str:
         """Get answer from Vector Store with Failed Banks"""
-
         q = query  # str | Search query term or phrase.
         table_name = 'text_amontillado'
         index = getIndex(table_name)
-
         with HiddenPrints():
             try:
                 # Get Answer
                 response = index.query(query, llm=llm)            
-            except Exception as e:
-                raise ValueError(f"Got error from Cassio / LangChain Index: {e}")
-
+            except ApiException as e:
+                raise ValueError(f"Got error from Cassio / LangChain Index 2 : {e}")
         return response
-
-
 
 # Check if the file is run directly
 # Can run this with `python utils/knowledge.py` to load the data 
