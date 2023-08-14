@@ -4,7 +4,10 @@ fly.toml
 __pycache__
 /.gtm/
 .env
+.env_jsb
+.env_proj
 .ruby-version
+/jsb/
 /vite/dist/assets
 vite/dist/assets
 /vite/dist/*.html
